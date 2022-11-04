@@ -1,0 +1,2120 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "type": "string",
+            "metadata": "Data Factory name",
+            "defaultValue": "ADF2-RDS"
+        },
+        "adventureworks_db_connectionString": {
+            "type": "secureString",
+            "metadata": "Secure string for 'connectionString' of 'adventureworks_db'"
+        },
+        "datalake_accountKey": {
+            "type": "secureString",
+            "metadata": "Secure string for 'accountKey' of 'datalake'"
+        },
+        "WeatherRest_LinkedService_properties_typeProperties_url": {
+            "type": "string",
+            "defaultValue": "https://api.weather.gov/gridpoints/SEW/124,67/forecast"
+        },
+        "datalake_properties_typeProperties_url": {
+            "type": "string",
+            "defaultValue": "https://storageaccount2rds.dfs.core.windows.net/"
+        }
+    },
+    "variables": {
+        "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('factoryName'), '/SCD2_pipeline')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "dataflow1",
+                        "type": "ExecuteDataFlow",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "dataflow": {
+                                "referenceName": "dataflow1",
+                                "type": "DataFlowReference",
+                                "parameters": {},
+                                "datasetParameters": {
+                                    "NewProducts": {},
+                                    "ExistingProducts": {},
+                                    "MaxID": {},
+                                    "MaxIDcached": {},
+                                    "WriteToDB": {}
+                                }
+                            },
+                            "staging": {},
+                            "compute": {
+                                "coreCount": 8,
+                                "computeType": "General"
+                            },
+                            "traceLevel": "Fine"
+                        }
+                    }
+                ],
+                "policy": {
+                    "elapsedTimeMetric": {},
+                    "cancelAfter": {}
+                },
+                "folder": {
+                    "name": "Chapter 6"
+                },
+                "annotations": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/dataflows/dataflow1')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/pipeline1')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Address Quality",
+                        "type": "ExecuteDataFlow",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "dataflow": {
+                                "referenceName": "Address Quality",
+                                "type": "DataFlowReference",
+                                "parameters": {},
+                                "datasetParameters": {
+                                    "source1": {},
+                                    "sinkaddresses": {}
+                                }
+                            },
+                            "staging": {},
+                            "compute": {
+                                "coreCount": 8,
+                                "computeType": "General"
+                            },
+                            "traceLevel": "Fine"
+                        }
+                    }
+                ],
+                "policy": {
+                    "elapsedTimeMetric": {},
+                    "cancelAfter": {}
+                },
+                "folder": {
+                    "name": "Chapter 5"
+                },
+                "annotations": [],
+                "lastPublishTime": "2022-10-21T13:24:48Z"
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/dataflows/Address Quality')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/90names')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "datalake",
+                    "type": "LinkedServiceReference"
+                },
+                "folder": {
+                    "name": "Chapter 7"
+                },
+                "annotations": [],
+                "type": "DelimitedText",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "fileName": "90names.csv",
+                        "fileSystem": "hoofdstuk7"
+                    },
+                    "columnDelimiter": ",",
+                    "escapeChar": "\\",
+                    "firstRowAsHeader": true,
+                    "quoteChar": "\""
+                },
+                "schema": [
+                    {
+                        "name": "Emp ID",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Name Prefix",
+                        "type": "String"
+                    },
+                    {
+                        "name": "First Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Middle Initial",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Last Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Gender",
+                        "type": "String"
+                    },
+                    {
+                        "name": "E Mail",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Father's Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Mother's Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Mother's Maiden Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Date of Birth",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Time of Birth",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Age in Yrs.",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Weight in Kgs.",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Date of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Quarter of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Half of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Year of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Month of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Month Name of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Short Month",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Day of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "DOW of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Short DOW",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Age in Company (Years)",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Salary",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Last % Hike",
+                        "type": "String"
+                    },
+                    {
+                        "name": "SSN",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Phone No. ",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Place Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "County",
+                        "type": "String"
+                    },
+                    {
+                        "name": "City",
+                        "type": "String"
+                    },
+                    {
+                        "name": "State",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Zip",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Region",
+                        "type": "String"
+                    },
+                    {
+                        "name": "User Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Password",
+                        "type": "String"
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/datalake')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/DelimitedText1')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "datalake",
+                    "type": "LinkedServiceReference"
+                },
+                "folder": {
+                    "name": "Chapter 4"
+                },
+                "annotations": [],
+                "type": "DelimitedText",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "fileSystem": "address-sink"
+                    },
+                    "columnDelimiter": ",",
+                    "escapeChar": "\\",
+                    "firstRowAsHeader": true,
+                    "quoteChar": "\""
+                },
+                "schema": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/datalake')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/ExistingProducts')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "adventureworks_db",
+                    "type": "LinkedServiceReference"
+                },
+                "folder": {
+                    "name": "Chapter 6"
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "schema": [
+                    {
+                        "name": "ProductID",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "Name",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "ProductNumber",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "Color",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "StandardCost",
+                        "type": "decimal",
+                        "precision": 19,
+                        "scale": 4
+                    },
+                    {
+                        "name": "ListPrice",
+                        "type": "decimal",
+                        "precision": 19,
+                        "scale": 4
+                    },
+                    {
+                        "name": "EffectiveDate",
+                        "type": "datetime",
+                        "precision": 23,
+                        "scale": 3
+                    },
+                    {
+                        "name": "Active",
+                        "type": "int",
+                        "precision": 10
+                    }
+                ],
+                "typeProperties": {
+                    "schema": "dbo",
+                    "table": "DimProductsTable"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/adventureworks_db')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/NewProducts')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "datalake",
+                    "type": "LinkedServiceReference"
+                },
+                "folder": {
+                    "name": "Chapter 6"
+                },
+                "annotations": [],
+                "type": "DelimitedText",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "fileName": "newproducts.csv",
+                        "fileSystem": "hoofdstuk6"
+                    },
+                    "columnDelimiter": ";",
+                    "escapeChar": "\\",
+                    "firstRowAsHeader": true,
+                    "quoteChar": "\""
+                },
+                "schema": [
+                    {
+                        "name": "Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "ProductNumber",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Color",
+                        "type": "String"
+                    },
+                    {
+                        "name": "StandardCost",
+                        "type": "String"
+                    },
+                    {
+                        "name": "ListPrice",
+                        "type": "String"
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/datalake')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/Weather_Rest')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "WeatherRest_LinkedService",
+                    "type": "LinkedServiceReference"
+                },
+                "folder": {
+                    "name": "Chapter 8"
+                },
+                "annotations": [],
+                "type": "RestResource",
+                "typeProperties": {},
+                "schema": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/WeatherRest_LinkedService')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/address_table')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "adventureworks_db",
+                    "type": "LinkedServiceReference"
+                },
+                "folder": {
+                    "name": "Chapter 4"
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "schema": [
+                    {
+                        "name": "AddressID",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "AddressLine1",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "AddressLine2",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "City",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "StateProvince",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "CountryRegion",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "PostalCode",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "rowguid",
+                        "type": "uniqueidentifier"
+                    },
+                    {
+                        "name": "ModifiedDate",
+                        "type": "datetime",
+                        "precision": 23,
+                        "scale": 3
+                    }
+                ],
+                "typeProperties": {
+                    "schema": "SalesLT",
+                    "table": "Address"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/adventureworks_db')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/deduplicated_90names_type1')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "datalake",
+                    "type": "LinkedServiceReference"
+                },
+                "folder": {
+                    "name": "Chapter 7"
+                },
+                "annotations": [],
+                "type": "DelimitedText",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "folderPath": "sink_type1",
+                        "fileSystem": "hoofdstuk7"
+                    },
+                    "columnDelimiter": ",",
+                    "escapeChar": "\\",
+                    "firstRowAsHeader": true,
+                    "quoteChar": "\""
+                },
+                "schema": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/datalake')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/WeatherRest_LinkedService')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "RestService",
+                "typeProperties": {
+                    "url": "[parameters('WeatherRest_LinkedService_properties_typeProperties_url')]",
+                    "enableServerCertificateValidation": true,
+                    "authenticationType": "Anonymous"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/adventureworks_db')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureSqlDatabase",
+                "typeProperties": {
+                    "connectionString": "[parameters('adventureworks_db_connectionString')]"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/datalake')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureBlobFS",
+                "typeProperties": {
+                    "url": "[parameters('datalake_properties_typeProperties_url')]",
+                    "accountKey": {
+                        "type": "SecureString",
+                        "value": "[parameters('datalake_accountKey')]"
+                    }
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/Address Quality')]",
+            "type": "Microsoft.DataFactory/factories/dataflows",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "folder": {
+                    "name": "Chapter 4"
+                },
+                "type": "MappingDataFlow",
+                "typeProperties": {
+                    "sources": [
+                        {
+                            "dataset": {
+                                "referenceName": "address_table",
+                                "type": "DatasetReference"
+                            },
+                            "name": "source1"
+                        }
+                    ],
+                    "sinks": [
+                        {
+                            "dataset": {
+                                "referenceName": "DelimitedText1",
+                                "type": "DatasetReference"
+                            },
+                            "name": "sinkaddresses"
+                        }
+                    ],
+                    "transformations": [
+                        {
+                            "name": "splitonna"
+                        },
+                        {
+                            "name": "FailMissingCols"
+                        },
+                        {
+                            "name": "AssertDataQuality"
+                        },
+                        {
+                            "name": "derivedColumn1"
+                        }
+                    ],
+                    "scriptLines": [
+                        "source(output(",
+                        "          AddressID as integer,",
+                        "          AddressLine1 as string,",
+                        "          AddressLine2 as string,",
+                        "          City as string,",
+                        "          StateProvince as string,",
+                        "          CountryRegion as string,",
+                        "          PostalCode as string,",
+                        "          rowguid as string,",
+                        "          ModifiedDate as timestamp",
+                        "     ),",
+                        "     allowSchemaDrift: true,",
+                        "     validateSchema: false,",
+                        "     isolationLevel: 'READ_UNCOMMITTED',",
+                        "     format: 'table') ~> source1",
+                        "source1 split(iif(!in(columnNames(), 'AddressID'), false(), \r",
+                        "    iif(!in(columnNames(), 'AddressLine1'), false(), \r",
+                        "        iif(!in(columnNames(), 'City'), false(), \r",
+                        "            iif(!in(columnNames(), 'StateProvince'), false(),\r",
+                        "                iif(!in(columnNames(), 'CountryRegion'), false(),\r",
+                        "                    iif(!in(columnNames(), 'PostalCode'), false(), true())))))),",
+                        "     disjoint: true) ~> splitonna@(Pass, Fail)",
+                        "splitonna@Fail assert(expectTrue(false(), false, 'MissingCols'),",
+                        "     abort: true) ~> FailMissingCols",
+                        "splitonna@Pass assert(expectTrue(CountryRegion=='United States', false, 'AssertUsOnly'),",
+                        "     expectUnique(AddressID, false, 'AssertUnique')) ~> AssertDataQuality",
+                        "AssertDataQuality derive(FullAddress = \"{AddressLine1} {City}, {StateProvince} {PostalCode}\") ~> derivedColumn1",
+                        "derivedColumn1 sink(allowSchemaDrift: true,",
+                        "     validateSchema: false,",
+                        "     umask: 0022,",
+                        "     preCommands: [],",
+                        "     postCommands: [],",
+                        "     skipDuplicateMapInputs: true,",
+                        "     skipDuplicateMapOutputs: true) ~> sinkaddresses"
+                    ]
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/address_table')]",
+                "[concat(variables('factoryId'), '/datasets/DelimitedText1')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/dataflow1')]",
+            "type": "Microsoft.DataFactory/factories/dataflows",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "folder": {
+                    "name": "Chapter 6"
+                },
+                "type": "MappingDataFlow",
+                "typeProperties": {
+                    "sources": [
+                        {
+                            "dataset": {
+                                "referenceName": "NewProducts",
+                                "type": "DatasetReference"
+                            },
+                            "name": "NewProducts"
+                        },
+                        {
+                            "dataset": {
+                                "referenceName": "ExistingProducts",
+                                "type": "DatasetReference"
+                            },
+                            "name": "ExistingProducts"
+                        },
+                        {
+                            "dataset": {
+                                "referenceName": "ExistingProducts",
+                                "type": "DatasetReference"
+                            },
+                            "name": "MaxID"
+                        }
+                    ],
+                    "sinks": [
+                        {
+                            "name": "MaxIDcached"
+                        },
+                        {
+                            "dataset": {
+                                "referenceName": "ExistingProducts",
+                                "type": "DatasetReference"
+                            },
+                            "name": "WriteToDB"
+                        }
+                    ],
+                    "transformations": [
+                        {
+                            "name": "FilterInactive"
+                        },
+                        {
+                            "name": "NewProductHash"
+                        },
+                        {
+                            "name": "ExistingProductHash"
+                        },
+                        {
+                            "name": "FilterNewRows"
+                        },
+                        {
+                            "name": "FilterExistingRows"
+                        },
+                        {
+                            "name": "CreateProductID"
+                        },
+                        {
+                            "name": "AddColumns"
+                        },
+                        {
+                            "name": "SetInactive"
+                        },
+                        {
+                            "name": "TagAlteredRow"
+                        },
+                        {
+                            "name": "UnionDatastreams"
+                        }
+                    ],
+                    "scriptLines": [
+                        "source(output(",
+                        "          Name as string,",
+                        "          ProductNumber as string,",
+                        "          Color as string,",
+                        "          StandardCost as decimal(10,0),",
+                        "          ListPrice as decimal(10,0)",
+                        "     ),",
+                        "     allowSchemaDrift: true,",
+                        "     validateSchema: false,",
+                        "     ignoreNoFilesFound: false) ~> NewProducts",
+                        "source(output(",
+                        "          ProductID as integer,",
+                        "          Name as string,",
+                        "          ProductNumber as string,",
+                        "          Color as string,",
+                        "          StandardCost as decimal(19,4),",
+                        "          ListPrice as decimal(19,4),",
+                        "          EffectiveDate as timestamp,",
+                        "          Active as integer",
+                        "     ),",
+                        "     allowSchemaDrift: true,",
+                        "     validateSchema: false,",
+                        "     isolationLevel: 'READ_UNCOMMITTED',",
+                        "     format: 'table') ~> ExistingProducts",
+                        "source(output(",
+                        "          maxID as integer",
+                        "     ),",
+                        "     allowSchemaDrift: true,",
+                        "     validateSchema: false,",
+                        "     isolationLevel: 'READ_UNCOMMITTED',",
+                        "     query: 'SELECT MAX(ProductID) AS maxID\\nFROM DimProductsTable',",
+                        "     format: 'query') ~> MaxID",
+                        "ExistingProducts filter(Active == 1) ~> FilterInactive",
+                        "NewProducts derive(HashNew = md5(Name,Color,StandardCost,ListPrice)) ~> NewProductHash",
+                        "FilterInactive derive(HashExisting = md5(Name,Color,StandardCost,ListPrice)) ~> ExistingProductHash",
+                        "CreateProductID, ExistingProductHash exists(NewProducts@ProductNumber == ExistingProducts@ProductNumber && HashExisting == HashNew,",
+                        "     negate:true,",
+                        "     broadcast: 'auto')~> FilterNewRows",
+                        "ExistingProductHash, FilterNewRows exists(ProductID == Key && HashExisting == HashNew,",
+                        "     negate:false,",
+                        "     broadcast: 'auto')~> FilterExistingRows",
+                        "NewProductHash keyGenerate(output(Key as long),",
+                        "     startAt: 1L,",
+                        "     stepValue: 1L) ~> CreateProductID",
+                        "FilterNewRows derive(ProductID = Key+toInteger(MaxIDcached#output().maxID),",
+                        "          Active = 1,",
+                        "          EffectiveDate = currentUTC()) ~> AddColumns",
+                        "FilterExistingRows derive(Active = 0) ~> SetInactive",
+                        "SetInactive alterRow(updateIf(true())) ~> TagAlteredRow",
+                        "AddColumns, TagAlteredRow union(byName: true)~> UnionDatastreams",
+                        "MaxID sink(validateSchema: false,",
+                        "     skipDuplicateMapInputs: true,",
+                        "     skipDuplicateMapOutputs: true,",
+                        "     store: 'cache',",
+                        "     format: 'inline',",
+                        "     output: false,",
+                        "     saveOrder: 1) ~> MaxIDcached",
+                        "UnionDatastreams sink(allowSchemaDrift: true,",
+                        "     validateSchema: false,",
+                        "     input(",
+                        "          ProductID as integer,",
+                        "          Name as string,",
+                        "          ProductNumber as string,",
+                        "          Color as string,",
+                        "          StandardCost as decimal(19,4),",
+                        "          ListPrice as decimal(19,4),",
+                        "          EffectiveDate as timestamp,",
+                        "          Active as integer",
+                        "     ),",
+                        "     deletable:false,",
+                        "     insertable:true,",
+                        "     updateable:true,",
+                        "     upsertable:false,",
+                        "     keys:['ProductID'],",
+                        "     format: 'table',",
+                        "     skipDuplicateMapInputs: true,",
+                        "     skipDuplicateMapOutputs: true,",
+                        "     errorHandlingOption: 'stopOnFirstError',",
+                        "     mapColumn(",
+                        "          ProductID,",
+                        "          Name,",
+                        "          ProductNumber,",
+                        "          Color,",
+                        "          StandardCost,",
+                        "          ListPrice,",
+                        "          EffectiveDate,",
+                        "          Active",
+                        "     )) ~> WriteToDB"
+                    ]
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/NewProducts')]",
+                "[concat(variables('factoryId'), '/datasets/ExistingProducts')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/dataflow2')]",
+            "type": "Microsoft.DataFactory/factories/dataflows",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "folder": {
+                    "name": "Chapter 8"
+                },
+                "type": "MappingDataFlow",
+                "typeProperties": {
+                    "sources": [
+                        {
+                            "dataset": {
+                                "referenceName": "Weather_Rest",
+                                "type": "DatasetReference"
+                            },
+                            "name": "source1"
+                        }
+                    ],
+                    "sinks": [
+                        {
+                            "dataset": {
+                                "referenceName": "output_weather",
+                                "type": "DatasetReference"
+                            },
+                            "name": "sink1"
+                        }
+                    ],
+                    "transformations": [
+                        {
+                            "name": "flatten1"
+                        },
+                        {
+                            "name": "derivedColumn1"
+                        },
+                        {
+                            "name": "aggregate1"
+                        },
+                        {
+                            "name": "derivedColumn2"
+                        }
+                    ],
+                    "scriptLines": [
+                        "source(output(",
+                        "          body as ({@context} as string[], geometry as (coordinates as double[][][], type as string), properties as (elevation as (unitCode as string, value as double), forecastGenerator as string, generatedAt as string, periods as (detailedForecast as string, endTime as string, icon as string, isDaytime as boolean, name as string, number as short, shortForecast as string, startTime as string, temperature as short, temperatureTrend as string, temperatureUnit as boolean, windDirection as string, windSpeed as string)[], units as string, updateTime as string, updated as string, validTimes as string), type as string),",
+                        "          headers as [string,string]",
+                        "     ),",
+                        "     allowSchemaDrift: true,",
+                        "     validateSchema: false,",
+                        "     httpMethod: 'GET',",
+                        "     timeout: 30,",
+                        "     requestInterval: 0,",
+                        "     paginationRules: ['supportRFC5988' -> 'true'],",
+                        "     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> source1",
+                        "source1 foldDown(unroll(body.properties.periods),",
+                        "     mapColumn(",
+                        "          forecastGenerator = body.properties.forecastGenerator,",
+                        "          generatedAt = body.properties.generatedAt,",
+                        "          detailedForecast = body.properties.periods.detailedForecast,",
+                        "          endTime = body.properties.periods.endTime,",
+                        "          icon = body.properties.periods.icon,",
+                        "          isDaytime = body.properties.periods.isDaytime,",
+                        "          name = body.properties.periods.name,",
+                        "          number = body.properties.periods.number,",
+                        "          shortForecast = body.properties.periods.shortForecast,",
+                        "          startTime = body.properties.periods.startTime,",
+                        "          temperature = body.properties.periods.temperature,",
+                        "          temperatureTrend = body.properties.periods.temperatureTrend,",
+                        "          temperatureUnit = body.properties.periods.temperatureUnit,",
+                        "          windDirection = body.properties.periods.windDirection,",
+                        "          windSpeed = body.properties.periods.windSpeed,",
+                        "          units = body.properties.units,",
+                        "          updateTime = body.properties.updateTime,",
+                        "          updated = body.properties.updated,",
+                        "          validTimes = body.properties.validTimes,",
+                        "          type = body.type",
+                        "     ),",
+                        "     skipDuplicateMapInputs: false,",
+                        "     skipDuplicateMapOutputs: false) ~> flatten1",
+                        "flatten1 derive(Forecasts = @(name=name,",
+                        "          shortforecast=shortForecast,",
+                        "          temperature=temperature)) ~> derivedColumn1",
+                        "derivedColumn1 aggregate(ForecastArray = collect(Forecasts)) ~> aggregate1",
+                        "aggregate1 derive(column1 = associate('When', ForecastArray.name, 'What', ForecastArray.shortforecast)) ~> derivedColumn2",
+                        "derivedColumn2 sink(allowSchemaDrift: true,",
+                        "     validateSchema: false,",
+                        "     input(",
+                        "          {Emp ID} as string,",
+                        "          {Name Prefix} as string,",
+                        "          {First Name} as string,",
+                        "          {Middle Initial} as string,",
+                        "          {Last Name} as string,",
+                        "          Gender as string,",
+                        "          {E Mail} as string,",
+                        "          {Father's Name} as string,",
+                        "          {Mother's Name} as string,",
+                        "          {Mother's Maiden Name} as string,",
+                        "          {Date of Birth} as string,",
+                        "          {Time of Birth} as string,",
+                        "          {Age in Yrs.} as string,",
+                        "          {Weight in Kgs.} as string,",
+                        "          {Date of Joining} as string,",
+                        "          {Quarter of Joining} as string,",
+                        "          {Half of Joining} as string,",
+                        "          {Year of Joining} as string,",
+                        "          {Month of Joining} as string,",
+                        "          {Month Name of Joining} as string,",
+                        "          {Short Month} as string,",
+                        "          {Day of Joining} as string,",
+                        "          {DOW of Joining} as string,",
+                        "          {Short DOW} as string,",
+                        "          {Age in Company (Years)} as string,",
+                        "          Salary as string,",
+                        "          {Last % Hike} as string,",
+                        "          SSN as string,",
+                        "          {Phone No. } as string,",
+                        "          {Place Name} as string,",
+                        "          County as string,",
+                        "          City as string,",
+                        "          State as string,",
+                        "          Zip as string,",
+                        "          Region as string,",
+                        "          {User Name} as string,",
+                        "          Password as string",
+                        "     ),",
+                        "     umask: 0022,",
+                        "     preCommands: [],",
+                        "     postCommands: [],",
+                        "     skipDuplicateMapInputs: true,",
+                        "     skipDuplicateMapOutputs: true) ~> sink1"
+                    ]
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/Weather_Rest')]",
+                "[concat(variables('factoryId'), '/datasets/output_weather')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/tyoe2_dedup')]",
+            "type": "Microsoft.DataFactory/factories/dataflows",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "folder": {
+                    "name": "Chapter 7"
+                },
+                "type": "MappingDataFlow",
+                "typeProperties": {
+                    "sources": [
+                        {
+                            "dataset": {
+                                "referenceName": "90names",
+                                "type": "DatasetReference"
+                            },
+                            "name": "source"
+                        }
+                    ],
+                    "sinks": [
+                        {
+                            "dataset": {
+                                "referenceName": "valid_output",
+                                "type": "DatasetReference"
+                            },
+                            "name": "sink1"
+                        },
+                        {
+                            "dataset": {
+                                "referenceName": "invalid_output",
+                                "type": "DatasetReference"
+                            },
+                            "name": "sink2"
+                        }
+                    ],
+                    "transformations": [
+                        {
+                            "name": "DeriveFullName"
+                        },
+                        {
+                            "name": "MapColumns"
+                        },
+                        {
+                            "name": "DeriveSoundex"
+                        },
+                        {
+                            "name": "DeduplicateSoundex"
+                        },
+                        {
+                            "name": "SoundexBranch"
+                        },
+                        {
+                            "name": "JoinSoundexBranch"
+                        },
+                        {
+                            "name": "Phonebranch"
+                        },
+                        {
+                            "name": "DeduplicatePhone"
+                        },
+                        {
+                            "name": "JoinPhonebranch"
+                        },
+                        {
+                            "name": "ZipBranch"
+                        },
+                        {
+                            "name": "DeduplicateZip"
+                        },
+                        {
+                            "name": "JoinZipBranch"
+                        },
+                        {
+                            "name": "AddCols"
+                        },
+                        {
+                            "name": "ScoreAlikeness"
+                        },
+                        {
+                            "name": "DropUnwantedCols"
+                        },
+                        {
+                            "name": "split1"
+                        }
+                    ],
+                    "scriptLines": [
+                        "source(output(",
+                        "          {Emp ID} as string,",
+                        "          {Name Prefix} as string,",
+                        "          {First Name} as string,",
+                        "          {Middle Initial} as string,",
+                        "          {Last Name} as string,",
+                        "          Gender as string,",
+                        "          {E Mail} as string,",
+                        "          {Father's Name} as string,",
+                        "          {Mother's Name} as string,",
+                        "          {Mother's Maiden Name} as string,",
+                        "          {Date of Birth} as string,",
+                        "          {Time of Birth} as string,",
+                        "          {Age in Yrs.} as string,",
+                        "          {Weight in Kgs.} as string,",
+                        "          {Date of Joining} as string,",
+                        "          {Quarter of Joining} as string,",
+                        "          {Half of Joining} as string,",
+                        "          {Year of Joining} as string,",
+                        "          {Month of Joining} as string,",
+                        "          {Month Name of Joining} as string,",
+                        "          {Short Month} as string,",
+                        "          {Day of Joining} as string,",
+                        "          {DOW of Joining} as string,",
+                        "          {Short DOW} as string,",
+                        "          {Age in Company (Years)} as string,",
+                        "          Salary as string,",
+                        "          {Last % Hike} as string,",
+                        "          SSN as string,",
+                        "          {Phone No. } as string,",
+                        "          {Place Name} as string,",
+                        "          County as string,",
+                        "          City as string,",
+                        "          State as string,",
+                        "          Zip as string,",
+                        "          Region as string,",
+                        "          {User Name} as string,",
+                        "          Password as string",
+                        "     ),",
+                        "     allowSchemaDrift: true,",
+                        "     validateSchema: false,",
+                        "     ignoreNoFilesFound: false) ~> source",
+                        "source derive(fullname = {First Name}+\" \"+{Last Name}) ~> DeriveFullName",
+                        "DeriveFullName select(mapColumn(",
+                        "          each(match(instr(name,'Phone')>0),",
+                        "               'phone' = $$),",
+                        "          each(match(instr(name,'Zip')>0),",
+                        "               'zip' = $$),",
+                        "          each(match(instr(name,'fullname')>0),",
+                        "               'fullname' = $$),",
+                        "          each(match(instr(name,'ID')>0),",
+                        "               'employe_id' = $$)",
+                        "     ),",
+                        "     skipDuplicateMapInputs: true,",
+                        "     skipDuplicateMapOutputs: true) ~> MapColumns",
+                        "MapColumns derive(SoundexValue = soundex(fullname)) ~> DeriveSoundex",
+                        "DeriveSoundex aggregate(groupBy(SoundexValue),",
+                        "     agg_soundex = sum(1)) ~> DeduplicateSoundex",
+                        "DeriveSoundex select(skipDuplicateMapInputs: true,",
+                        "     skipDuplicateMapOutputs: true) ~> SoundexBranch",
+                        "DeduplicateSoundex, SoundexBranch join(DeduplicateSoundex@SoundexValue == SoundexBranch@SoundexValue,",
+                        "     joinType:'inner',",
+                        "     matchType:'exact',",
+                        "     ignoreSpaces: false,",
+                        "     broadcast: 'auto')~> JoinSoundexBranch",
+                        "JoinSoundexBranch select(mapColumn(",
+                        "          SoundexValue = DeduplicateSoundex@SoundexValue,",
+                        "          agg_soundex,",
+                        "          phone,",
+                        "          zip,",
+                        "          fullname,",
+                        "          employe_id",
+                        "     ),",
+                        "     skipDuplicateMapInputs: true,",
+                        "     skipDuplicateMapOutputs: true) ~> Phonebranch",
+                        "JoinSoundexBranch aggregate(groupBy(DeduplicateSoundex@SoundexValue,",
+                        "          phone),",
+                        "     agg_phone = sum(1),",
+                        "          phone2 = first(phone)) ~> DeduplicatePhone",
+                        "DeduplicatePhone, Phonebranch join(DeduplicatePhone@SoundexValue == Phonebranch@SoundexValue,",
+                        "     joinType:'right',",
+                        "     matchType:'exact',",
+                        "     ignoreSpaces: false,",
+                        "     broadcast: 'auto')~> JoinPhonebranch",
+                        "JoinPhonebranch select(mapColumn(",
+                        "          SoundexValue = DeduplicatePhone@SoundexValue,",
+                        "          phone = DeduplicatePhone@phone,",
+                        "          agg_phone,",
+                        "          phone2,",
+                        "          agg_soundex,",
+                        "          zip,",
+                        "          fullname,",
+                        "          employe_id",
+                        "     ),",
+                        "     skipDuplicateMapInputs: true,",
+                        "     skipDuplicateMapOutputs: true) ~> ZipBranch",
+                        "JoinPhonebranch aggregate(groupBy(DeduplicatePhone@SoundexValue,",
+                        "          zip),",
+                        "     zip_count = sum(1),",
+                        "          zip2 = first(zip)) ~> DeduplicateZip",
+                        "DeduplicateZip, ZipBranch join(DeduplicateZip@SoundexValue == ZipBranch@SoundexValue,",
+                        "     joinType:'right',",
+                        "     matchType:'exact',",
+                        "     ignoreSpaces: false,",
+                        "     broadcast: 'auto')~> JoinZipBranch",
+                        "JoinZipBranch derive(soundex_weight = 50,",
+                        "          phone_weight = 25,",
+                        "          zip_weight = 25,",
+                        "          soundex_bool = iif(agg_soundex > 1, 1, 0),",
+                        "          phone_bool = iif(agg_phone > 1, 1, 0),",
+                        "          zip_bool = iif(zip_count > 1, 1, 0)) ~> AddCols",
+                        "AddCols derive(alikeness_score = (soundex_bool * soundex_weight) + (zip_bool * zip_weight) + (phone_bool * phone_weight)) ~> ScoreAlikeness",
+                        "ScoreAlikeness select(mapColumn(",
+                        "          SoundexValue = ZipBranch@SoundexValue,",
+                        "          phone,",
+                        "          zip = ZipBranch@zip,",
+                        "          fullname,",
+                        "          employe_id,",
+                        "          alikeness_score",
+                        "     ),",
+                        "     skipDuplicateMapInputs: true,",
+                        "     skipDuplicateMapOutputs: true) ~> DropUnwantedCols",
+                        "DropUnwantedCols split(alikeness_score < 75,",
+                        "     disjoint: false) ~> split1@(valid, invalid)",
+                        "split1@valid sink(allowSchemaDrift: true,",
+                        "     validateSchema: false,",
+                        "     input(",
+                        "          Column_1 as string,",
+                        "          Column_2 as string,",
+                        "          Column_3 as string,",
+                        "          Column_4 as string,",
+                        "          Column_5 as string,",
+                        "          Column_6 as string,",
+                        "          Column_7 as string,",
+                        "          Column_8 as string,",
+                        "          Column_9 as string,",
+                        "          Column_10 as string,",
+                        "          Column_11 as string,",
+                        "          Column_12 as string,",
+                        "          Column_13 as string,",
+                        "          Column_14 as string,",
+                        "          Column_15 as string,",
+                        "          Column_16 as string,",
+                        "          Column_17 as string,",
+                        "          Column_18 as string,",
+                        "          Column_19 as string,",
+                        "          Column_20 as string,",
+                        "          Column_21 as string,",
+                        "          Column_22 as string,",
+                        "          Column_23 as string,",
+                        "          Column_24 as string,",
+                        "          Column_25 as string,",
+                        "          Column_26 as string,",
+                        "          Column_27 as string,",
+                        "          Column_28 as string,",
+                        "          Column_29 as string,",
+                        "          Column_30 as string,",
+                        "          Column_31 as string,",
+                        "          Column_32 as string,",
+                        "          Column_33 as string,",
+                        "          Column_34 as string,",
+                        "          Column_35 as string,",
+                        "          Column_36 as string,",
+                        "          Column_37 as string",
+                        "     ),",
+                        "     umask: 0022,",
+                        "     preCommands: [],",
+                        "     postCommands: [],",
+                        "     skipDuplicateMapInputs: true,",
+                        "     skipDuplicateMapOutputs: true) ~> sink1",
+                        "split1@invalid sink(allowSchemaDrift: true,",
+                        "     validateSchema: false,",
+                        "     input(",
+                        "          {Emp ID} as string,",
+                        "          {Name Prefix} as string,",
+                        "          {First Name} as string,",
+                        "          {Middle Initial} as string,",
+                        "          {Last Name} as string,",
+                        "          Gender as string,",
+                        "          {E Mail} as string,",
+                        "          {Father's Name} as string,",
+                        "          {Mother's Name} as string,",
+                        "          {Mother's Maiden Name} as string,",
+                        "          {Date of Birth} as string,",
+                        "          {Time of Birth} as string,",
+                        "          {Age in Yrs.} as string,",
+                        "          {Weight in Kgs.} as string,",
+                        "          {Date of Joining} as string,",
+                        "          {Quarter of Joining} as string,",
+                        "          {Half of Joining} as string,",
+                        "          {Year of Joining} as string,",
+                        "          {Month of Joining} as string,",
+                        "          {Month Name of Joining} as string,",
+                        "          {Short Month} as string,",
+                        "          {Day of Joining} as string,",
+                        "          {DOW of Joining} as string,",
+                        "          {Short DOW} as string,",
+                        "          {Age in Company (Years)} as string,",
+                        "          Salary as string,",
+                        "          {Last % Hike} as string,",
+                        "          SSN as string,",
+                        "          {Phone No. } as string,",
+                        "          {Place Name} as string,",
+                        "          County as string,",
+                        "          City as string,",
+                        "          State as string,",
+                        "          Zip as string,",
+                        "          Region as string,",
+                        "          {User Name} as string,",
+                        "          Password as string",
+                        "     ),",
+                        "     umask: 0022,",
+                        "     preCommands: [],",
+                        "     postCommands: [],",
+                        "     skipDuplicateMapInputs: true,",
+                        "     skipDuplicateMapOutputs: true) ~> sink2"
+                    ]
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/90names')]",
+                "[concat(variables('factoryId'), '/datasets/valid_output')]",
+                "[concat(variables('factoryId'), '/datasets/invalid_output')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/type1_dedup')]",
+            "type": "Microsoft.DataFactory/factories/dataflows",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "folder": {
+                    "name": "Chapter 7"
+                },
+                "type": "MappingDataFlow",
+                "typeProperties": {
+                    "sources": [
+                        {
+                            "dataset": {
+                                "referenceName": "90names",
+                                "type": "DatasetReference"
+                            },
+                            "name": "sourcedataset"
+                        }
+                    ],
+                    "sinks": [
+                        {
+                            "dataset": {
+                                "referenceName": "deduplicated_90names_type1",
+                                "type": "DatasetReference"
+                            },
+                            "name": "Sink"
+                        }
+                    ],
+                    "transformations": [
+                        {
+                            "name": "CalculateHash"
+                        },
+                        {
+                            "name": "AggregateValues"
+                        }
+                    ],
+                    "scriptLines": [
+                        "source(output(",
+                        "          {Emp ID} as string,",
+                        "          {Name Prefix} as string,",
+                        "          {First Name} as string,",
+                        "          {Middle Initial} as string,",
+                        "          {Last Name} as string,",
+                        "          Gender as string,",
+                        "          {E Mail} as string,",
+                        "          {Father's Name} as string,",
+                        "          {Mother's Name} as string,",
+                        "          {Mother's Maiden Name} as string,",
+                        "          {Date of Birth} as string,",
+                        "          {Time of Birth} as string,",
+                        "          {Age in Yrs.} as string,",
+                        "          {Weight in Kgs.} as string,",
+                        "          {Date of Joining} as string,",
+                        "          {Quarter of Joining} as string,",
+                        "          {Half of Joining} as string,",
+                        "          {Year of Joining} as string,",
+                        "          {Month of Joining} as string,",
+                        "          {Month Name of Joining} as string,",
+                        "          {Short Month} as string,",
+                        "          {Day of Joining} as string,",
+                        "          {DOW of Joining} as string,",
+                        "          {Short DOW} as string,",
+                        "          {Age in Company (Years)} as string,",
+                        "          Salary as string,",
+                        "          {Last % Hike} as string,",
+                        "          SSN as string,",
+                        "          {Phone No. } as string,",
+                        "          {Place Name} as string,",
+                        "          County as string,",
+                        "          City as string,",
+                        "          State as string,",
+                        "          Zip as string,",
+                        "          Region as string,",
+                        "          {User Name} as string,",
+                        "          Password as string",
+                        "     ),",
+                        "     allowSchemaDrift: true,",
+                        "     validateSchema: false,",
+                        "     ignoreNoFilesFound: false) ~> sourcedataset",
+                        "sourcedataset derive(hashedcol = sha2(256, columns())) ~> CalculateHash",
+                        "CalculateHash aggregate(groupBy(hashedcol),",
+                        "     each(match(name!='hashedcol'), $$ = first($$))) ~> AggregateValues",
+                        "AggregateValues sink(allowSchemaDrift: true,",
+                        "     validateSchema: false,",
+                        "     umask: 0022,",
+                        "     preCommands: [],",
+                        "     postCommands: [],",
+                        "     skipDuplicateMapInputs: true,",
+                        "     skipDuplicateMapOutputs: true) ~> Sink"
+                    ]
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/90names')]",
+                "[concat(variables('factoryId'), '/datasets/deduplicated_90names_type1')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/type2_dedup_flowlet')]",
+            "type": "Microsoft.DataFactory/factories/dataflows",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "folder": {
+                    "name": "Chapter 7"
+                },
+                "type": "Flowlet",
+                "typeProperties": {
+                    "sources": [],
+                    "sinks": [],
+                    "transformations": [
+                        {
+                            "name": "DeriveFullName"
+                        },
+                        {
+                            "name": "MapColumns"
+                        },
+                        {
+                            "name": "DeriveSoundex"
+                        },
+                        {
+                            "name": "DeduplicateSoundex"
+                        },
+                        {
+                            "name": "SoundexBranch"
+                        },
+                        {
+                            "name": "JoinSoundexBranch"
+                        },
+                        {
+                            "name": "Phonebranch"
+                        },
+                        {
+                            "name": "DeduplicatePhone"
+                        },
+                        {
+                            "name": "JoinPhonebranch"
+                        },
+                        {
+                            "name": "ZipBranch"
+                        },
+                        {
+                            "name": "DeduplicateZip"
+                        },
+                        {
+                            "name": "JoinZipBranch"
+                        },
+                        {
+                            "name": "AddCols"
+                        },
+                        {
+                            "name": "ScoreAlikeness"
+                        },
+                        {
+                            "name": "DropUnwantedCols"
+                        },
+                        {
+                            "name": "split1"
+                        },
+                        {
+                            "name": "input"
+                        },
+                        {
+                            "name": "output1"
+                        },
+                        {
+                            "name": "output2"
+                        }
+                    ],
+                    "scriptLines": [
+                        "input(output(",
+                        "          {Emp ID} as string,",
+                        "          {Name Prefix} as string,",
+                        "          {First Name} as string,",
+                        "          {Middle Initial} as string,",
+                        "          {Last Name} as string,",
+                        "          Gender as string,",
+                        "          {E Mail} as string,",
+                        "          {Father's Name} as string,",
+                        "          {Mother's Name} as string,",
+                        "          {Mother's Maiden Name} as string,",
+                        "          {Date of Birth} as string,",
+                        "          {Time of Birth} as string,",
+                        "          {Age in Yrs.} as string,",
+                        "          {Weight in Kgs.} as string,",
+                        "          {Date of Joining} as string,",
+                        "          {Quarter of Joining} as string,",
+                        "          {Half of Joining} as string,",
+                        "          {Year of Joining} as string,",
+                        "          {Month of Joining} as string,",
+                        "          {Month Name of Joining} as string,",
+                        "          {Short Month} as string,",
+                        "          {Day of Joining} as string,",
+                        "          {DOW of Joining} as string,",
+                        "          {Short DOW} as string,",
+                        "          {Age in Company (Years)} as string,",
+                        "          Salary as string,",
+                        "          {Last % Hike} as string,",
+                        "          SSN as string,",
+                        "          {Phone No. } as string,",
+                        "          {Place Name} as string,",
+                        "          County as string,",
+                        "          City as string,",
+                        "          State as string,",
+                        "          Zip as string,",
+                        "          Region as string,",
+                        "          {User Name} as string,",
+                        "          Password as string",
+                        "     ),",
+                        "     order: 0) ~> input",
+                        "input derive(fullname = {First Name}+\" \"+{Last Name}) ~> DeriveFullName",
+                        "DeriveFullName select(mapColumn(",
+                        "          each(match(instr(name,'Phone')>0),",
+                        "               'phone' = $$),",
+                        "          each(match(instr(name,'Zip')>0),",
+                        "               'zip' = $$),",
+                        "          each(match(instr(name,'fullname')>0),",
+                        "               'fullname' = $$),",
+                        "          each(match(instr(name,'ID')>0),",
+                        "               'employe_id' = $$)",
+                        "     ),",
+                        "     skipDuplicateMapInputs: true,",
+                        "     skipDuplicateMapOutputs: true) ~> MapColumns",
+                        "MapColumns derive(SoundexValue = soundex(fullname)) ~> DeriveSoundex",
+                        "DeriveSoundex aggregate(groupBy(SoundexValue),",
+                        "     agg_soundex = sum(1)) ~> DeduplicateSoundex",
+                        "DeriveSoundex select(skipDuplicateMapInputs: true,",
+                        "     skipDuplicateMapOutputs: true) ~> SoundexBranch",
+                        "DeduplicateSoundex, SoundexBranch join(DeduplicateSoundex@SoundexValue == SoundexBranch@SoundexValue,",
+                        "     joinType:'inner',",
+                        "     matchType:'exact',",
+                        "     ignoreSpaces: false,",
+                        "     broadcast: 'auto')~> JoinSoundexBranch",
+                        "JoinSoundexBranch select(mapColumn(",
+                        "          SoundexValue = DeduplicateSoundex@SoundexValue,",
+                        "          agg_soundex,",
+                        "          phone,",
+                        "          zip,",
+                        "          fullname,",
+                        "          employe_id",
+                        "     ),",
+                        "     skipDuplicateMapInputs: true,",
+                        "     skipDuplicateMapOutputs: true) ~> Phonebranch",
+                        "JoinSoundexBranch aggregate(groupBy(DeduplicateSoundex@SoundexValue,",
+                        "          phone),",
+                        "     agg_phone = sum(1),",
+                        "          phone2 = first(phone)) ~> DeduplicatePhone",
+                        "DeduplicatePhone, Phonebranch join(DeduplicatePhone@SoundexValue == Phonebranch@SoundexValue,",
+                        "     joinType:'right',",
+                        "     matchType:'exact',",
+                        "     ignoreSpaces: false,",
+                        "     broadcast: 'auto')~> JoinPhonebranch",
+                        "JoinPhonebranch select(mapColumn(",
+                        "          SoundexValue = DeduplicatePhone@SoundexValue,",
+                        "          phone = DeduplicatePhone@phone,",
+                        "          agg_phone,",
+                        "          phone2,",
+                        "          agg_soundex,",
+                        "          zip,",
+                        "          fullname,",
+                        "          employe_id",
+                        "     ),",
+                        "     skipDuplicateMapInputs: true,",
+                        "     skipDuplicateMapOutputs: true) ~> ZipBranch",
+                        "JoinPhonebranch aggregate(groupBy(DeduplicatePhone@SoundexValue,",
+                        "          zip),",
+                        "     zip_count = sum(1),",
+                        "          zip2 = first(zip)) ~> DeduplicateZip",
+                        "DeduplicateZip, ZipBranch join(DeduplicateZip@SoundexValue == ZipBranch@SoundexValue,",
+                        "     joinType:'right',",
+                        "     matchType:'exact',",
+                        "     ignoreSpaces: false,",
+                        "     broadcast: 'auto')~> JoinZipBranch",
+                        "JoinZipBranch derive(soundex_weight = 50,",
+                        "          phone_weight = 25,",
+                        "          zip_weight = 25,",
+                        "          soundex_bool = iif(agg_soundex > 1, 1, 0),",
+                        "          phone_bool = iif(agg_phone > 1, 1, 0),",
+                        "          zip_bool = iif(zip_count > 1, 1, 0)) ~> AddCols",
+                        "AddCols derive(alikeness_score = (soundex_bool * soundex_weight) + (zip_bool * zip_weight) + (phone_bool * phone_weight)) ~> ScoreAlikeness",
+                        "ScoreAlikeness select(mapColumn(",
+                        "          SoundexValue = ZipBranch@SoundexValue,",
+                        "          phone,",
+                        "          zip = ZipBranch@zip,",
+                        "          fullname,",
+                        "          employe_id,",
+                        "          alikeness_score",
+                        "     ),",
+                        "     skipDuplicateMapInputs: true,",
+                        "     skipDuplicateMapOutputs: true) ~> DropUnwantedCols",
+                        "DropUnwantedCols split(alikeness_score < 75,",
+                        "     disjoint: false) ~> split1@(valid, invalid)",
+                        "split1@valid output() ~> output1",
+                        "split1@invalid output() ~> output2"
+                    ]
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/output_weather')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "datalake",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "DelimitedText",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "fileSystem": "hoofdstuk7"
+                    },
+                    "columnDelimiter": ",",
+                    "escapeChar": "\\",
+                    "firstRowAsHeader": true,
+                    "quoteChar": "\""
+                },
+                "schema": [
+                    {
+                        "name": "Emp ID",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Name Prefix",
+                        "type": "String"
+                    },
+                    {
+                        "name": "First Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Middle Initial",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Last Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Gender",
+                        "type": "String"
+                    },
+                    {
+                        "name": "E Mail",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Father's Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Mother's Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Mother's Maiden Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Date of Birth",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Time of Birth",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Age in Yrs.",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Weight in Kgs.",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Date of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Quarter of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Half of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Year of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Month of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Month Name of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Short Month",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Day of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "DOW of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Short DOW",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Age in Company (Years)",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Salary",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Last % Hike",
+                        "type": "String"
+                    },
+                    {
+                        "name": "SSN",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Phone No. ",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Place Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "County",
+                        "type": "String"
+                    },
+                    {
+                        "name": "City",
+                        "type": "String"
+                    },
+                    {
+                        "name": "State",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Zip",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Region",
+                        "type": "String"
+                    },
+                    {
+                        "name": "User Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Password",
+                        "type": "String"
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/datalake')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/valid_output')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "datalake",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "DelimitedText",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "fileSystem": "hoofdstuk7"
+                    },
+                    "columnDelimiter": ",",
+                    "escapeChar": "\\",
+                    "quoteChar": "\""
+                },
+                "schema": [
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    },
+                    {
+                        "type": "String"
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/datalake')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/invalid_output')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "datalake",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "DelimitedText",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "fileSystem": "hoofdstuk7"
+                    },
+                    "columnDelimiter": ",",
+                    "escapeChar": "\\",
+                    "firstRowAsHeader": true,
+                    "quoteChar": "\""
+                },
+                "schema": [
+                    {
+                        "name": "Emp ID",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Name Prefix",
+                        "type": "String"
+                    },
+                    {
+                        "name": "First Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Middle Initial",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Last Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Gender",
+                        "type": "String"
+                    },
+                    {
+                        "name": "E Mail",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Father's Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Mother's Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Mother's Maiden Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Date of Birth",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Time of Birth",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Age in Yrs.",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Weight in Kgs.",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Date of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Quarter of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Half of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Year of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Month of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Month Name of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Short Month",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Day of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "DOW of Joining",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Short DOW",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Age in Company (Years)",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Salary",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Last % Hike",
+                        "type": "String"
+                    },
+                    {
+                        "name": "SSN",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Phone No. ",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Place Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "County",
+                        "type": "String"
+                    },
+                    {
+                        "name": "City",
+                        "type": "String"
+                    },
+                    {
+                        "name": "State",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Zip",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Region",
+                        "type": "String"
+                    },
+                    {
+                        "name": "User Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Password",
+                        "type": "String"
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/datalake')]"
+            ]
+        }
+    ]
+}

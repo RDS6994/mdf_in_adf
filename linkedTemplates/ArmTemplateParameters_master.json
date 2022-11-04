@@ -1,0 +1,27 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "value": "ADF2-RDS"
+        },
+        "adventureworks_db_connectionString": {
+            "value": ""
+        },
+        "datalake_accountKey": {
+            "value": ""
+        },
+        "WeatherRest_LinkedService_properties_typeProperties_url": {
+            "value": "https://api.weather.gov/gridpoints/SEW/124,67/forecast"
+        },
+        "datalake_properties_typeProperties_url": {
+            "value": "https://storageaccount2rds.dfs.core.windows.net/"
+        },
+        "containerUri": {
+            "value": ""
+        },
+        "containerSasToken": {
+            "value": ""
+        }
+    }
+}
